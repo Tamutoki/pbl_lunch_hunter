@@ -1,4 +1,4 @@
-# pbl_Lunch_Hunter
+# Lunch_Hunter
 
 #### **a.** コードを開発環境に配置
 ```shell
