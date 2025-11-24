@@ -12,7 +12,7 @@ $no_header_ouput =[
     'user_logout', 'user_check', 'user_save', 'rst_save', 'rev_save',
 ];
 
-$do = $_GET['do'] ?? 'rst_list';
+$do = $_GET['do'] ?? 'user_login';
 if(in_array($do, $no_header_ouput)){
     include "src/{$do}.php";
 } else {
