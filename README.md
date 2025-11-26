@@ -3,7 +3,7 @@
 #### **a.** コードを開発環境に配置
 ```shell
 C:/php/lampp-docker8/htdocs/
- ├ pbl2025/
+ ├ pbl_lunch_hunter/
    ├─ css/   CSSファイルが入っている
    ├─ docs/  データベースの構成等の説明が入っている
    ├─ src/   主要機能や画面の実装のPHPソースファイルが入っている
