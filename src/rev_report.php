@@ -34,9 +34,9 @@ $reports = $reports ?? [
 <h1>通報済み口コミ一覧表示</h1>
 
 <div class="top-btn">
-    <button>通報取り消し一覧</button>
-    <button>非表示</button>
-    <button>投稿の古い順</button>
+    <button type="button" onclick="location.href='cancel_list.php'">通報取り消し一覧</button>
+    <button type="button" onclick="location.href='hidden_list.php'">非表示</button>
+    <button type="button" onclick="location.href='oldest_first.php'">投稿の古い順</button>
 </div>
 
 <?php foreach ($reports as $r): ?>
@@ -64,9 +64,10 @@ $reports = $reports ?? [
         <h3>▲ <?= htmlspecialchars($r["store"]) ?></h3>
         <p>通報内容：<?= htmlspecialchars($r["report_reason"]) ?></p>
 
-        <button class="btn-detail">詳細</button>
-        <button class="btn-cancel">取り消し</button>
-        <button class="btn-delete">削除</button>
+        <!-- クリックでリンク先へ遷移 -->
+        <button type="button" onclick="location.href='detail.php?id=<?= $r[''] ?>'">詳細</button>
+        <button type="button" onclick="location.href='cancel.php?id=<?= $r[''] ?>'">取り消し</button>
+        <button type="button" onclick="location.href='delete.php?id=<?= $r[''] ?>'">削除</button>
     </div>
 
 </section>
