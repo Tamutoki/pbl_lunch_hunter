@@ -1,194 +1,178 @@
 
 <?php
-// 簡易サーバーサイド版：GET パラメータで検索・絞り込み・並び替え・ページングを行います。
-
-$genres = [
-  "うどん","そば","肉料理","定食","カレー","ファストフード",
-  "焼肉","洋食","中華","その他","カフェ"
-];
-
+// 店舗一覧
 $mockStores = [
-  ["id"=>1,"name"=>"丸亀製麺 九重大橋店","rating"=>4.0,"image"=>"https://images.unsplash.com/photo-1683431686868-bdb1c683cc6d?w=1080","tags"=>["うどん","和食"],"registeredBy"=>"九州健児","hasDiscount"=>false,"isFavorite"=>false],
-  ["id"=>2,"name"=>"福工大前店","rating"=>3.0,"image"=>"https://images.unsplash.com/photo-1562560471-cb5b5f96c1ab?w=1080","tags"=>["和食","その他"],"registeredBy"=>"福工","hasDiscount"=>true,"isFavorite"=>true],
-  ["id"=>3,"name"=>"カフェテリア","rating"=>4.5,"image"=>"https://images.unsplash.com/photo-1648808694138-6706c5efc80a?w=1080","tags"=>["カフェ","洋食"],"registeredBy"=>"田中","hasDiscount"=>false,"isFavorite"=>true],
-  ["id"=>4,"name"=>"とんかつ専門店","rating"=>4.2,"image"=>"https://images.unsplash.com/photo-1625189657980-b419b768b0f6?w=1080","tags"=>["定食","肉料理"],"registeredBy"=>"山田","hasDiscount"=>true,"isFavorite"=>false],
+    [
+        'RST_ID' => 1,
+        'RST_NAME' => '丸亀製麺 九重大橋店',
+        'RST_ADDRESS' => '福岡県福岡市城南区七隈〜〜',
+        'START_TIME_H' => 10, 'START_TIME_M' => 30,
+        'END_TIME_H' => 21, 'END_TIME_M' => 0,
+        'TEL_NUM' => '092-000-0000',
+        'RST_HOLIDAY' => 0,
+        'RST_PAY' => 2,
+        'RST_INFO' => '讃岐うどんの専門店。コシのある麺が自慢で、天ぷらも人気です。',
+        'PHOTO1' => 'https://images.unsplash.com/photo-1683431686868-bdb1c683cc6d',
+        'USER_ID' => 'KYUSHU01',
+        'DISCOUNT' => false,
+        'rating' => 4.0,
+        'isFavorite' => false,
+        'tags' => ['うどん', '和食'],
+    ],
+    [
+        'RST_ID' => 2,
+        'RST_NAME' => '福工大前 食堂',
+        'RST_ADDRESS' => '福岡県東区和白東〜〜',
+        'START_TIME_H' => 9, 'START_TIME_M' => 0,
+        'END_TIME_H' => 22, 'END_TIME_M' => 0,
+        'TEL_NUM' => '092-111-2222',
+        'RST_HOLIDAY' => 1,
+        'RST_PAY' => 1,
+        'RST_INFO' => 'リーズナブルで学生に大人気。ボリューム満点の定食があります。',
+        'PHOTO1' => 'https://images.unsplash.com/photo-1562560471-cb5b5f96c1ab',
+        'USER_ID' => 'FUKUKO01',
+        'DISCOUNT' => true,
+        'rating' => 3.0,
+        'isFavorite' => true,
+        'tags' => ['和食', 'その他'],
+    ],
 ];
 
-// GET パラメータ取得
-$keyword = trim((string)($_GET['keyword'] ?? ''));
-$sortBy = in_array($_GET['sortBy'] ?? 'popular', ['popular','newest']) ? $_GET['sortBy'] : 'popular';
-$selectedGenres = isset($_GET['genres']) ? (array)$_GET['genres'] : [];
-$showDiscountOnly = isset($_GET['discount']) && ($_GET['discount'] === '1' || $_GET['discount'] === 'on');
-$showFavoritesOnly = isset($_GET['favorite']) && ($_GET['favorite'] === '1' || $_GET['favorite'] === 'on');
-$currentPage = max(1, (int)($_GET['page'] ?? 1));
-$perPage = 5;
-
-// フィルタリング
-$filtered = array_filter($mockStores, function($s) use ($keyword, $selectedGenres, $showDiscountOnly, $showFavoritesOnly) {
-    if ($keyword !== '') {
-        $k = mb_strtolower($keyword);
-        if (mb_stripos($s['name'],$k) === false && !array_filter($s['tags'], fn($t)=> mb_stripos($t,$k)!==false)) {
-            return false;
-        }
-    }
-    if ($showDiscountOnly && !$s['hasDiscount']) return false;
-    if ($showFavoritesOnly && !$s['isFavorite']) return false;
-    if (!empty($selectedGenres)) {
-        // ジャンルのいずれかが含まれるものを残す
-        $intersect = array_intersect($selectedGenres, $s['tags']);
-        if (empty($intersect)) return false;
-    }
-    return true;
-});
-
-// 並び替え
-if ($sortBy === 'popular') {
-    usort($filtered, fn($a,$b) => $b['rating'] <=> $a['rating']);
-} else { // newest -> id desc (サンプル)
-    usort($filtered, fn($a,$b) => $b['id'] <=> $a['id']);
-}
-
-// ページング
-$total = count($filtered);
-$totalPages = (int)ceil($total / $perPage);
-if ($currentPage > $totalPages && $totalPages>0) $currentPage = $totalPages;
-$offset = ($currentPage - 1) * $perPage;
-$visible = array_slice($filtered, $offset, $perPage);
-
-// ヘルパー
 function h($v){ return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
-function build_query_with($overrides = []) {
-    $q = array_merge($_GET, $overrides);
-    return http_build_query($q);
-}
-?><!doctype html>
+
+$filter = mb_strtolower(trim((string)($_GET['filter'] ?? '')));
+$page = max(0, (int)($_GET['page'] ?? 0));
+$perPage = 10;
+
+// フィルタ処理（店舗名・住所）
+$filtered = array_values(array_filter($mockStores, function($s) use ($filter) {
+    if ($filter === '') return true;
+    return (mb_stripos($s['RST_NAME'], $filter) !== false) || (mb_stripos($s['RST_ADDRESS'], $filter) !== false);
+}));
+
+$total = count($filtered);
+$displayed = array_slice($filtered, $page * $perPage, $perPage);
+
+// 曜日・支払方法ラベル
+$holidayName = ['日','月','火','水','木','金','土'];
+$payMethod = ['現金','電子マネー','クレジットカード'];
+?>
+<!doctype html>
 <html lang="ja">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>店舗一覧 - Lunch Hunter</title>
-<link rel="stylesheet" href="../styles/StoreListPage.css">
 <style>
-/* 最低限のスタイル（既存CSSがあれば上書き可） */
-body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:0;background:#f7f7f7}
-.header{background:#fff;padding:12px 16px;border-bottom:1px solid #e5e5e5;display:flex;justify-content:space-between;align-items:center}
-.header .title{font-size:20px}
-.nav-buttons button{margin-left:8px}
-.container{max-width:1100px;margin:20px auto;padding:0 16px}
-.card{background:#fff;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.06);padding:12px;margin-bottom:12px}
-.store-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-top:12px}
-.store-image{width:100%;height:140px;object-fit:cover;border-radius:4px}
-.badge{display:inline-block;background:#ff6b6b;color:#fff;padding:2px 6px;border-radius:4px;font-size:12px;margin-right:6px}
-.store-header{display:flex;justify-content:space-between;align-items:center}
-.store-tags{margin-top:8px}
-.pagination{margin-top:12px}
-.search-toggle{float:right}
-.form-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-.checkbox-inline{display:inline-flex;align-items:center;gap:6px;margin-right:8px}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;background:#f7f7f7;margin:0;padding:24px}
+.container{max-width:1100px;margin:0 auto}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.page-title{font-size:24px;font-weight:700}
+.form-input{width:100%;padding:10px;border-radius:8px;border:1px solid #ddd}
+.store-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px;margin-top:18px}
+.card{background:#fff;border-radius:10px;padding:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);cursor:default}
+.store-image{width:100%;height:180px;object-fit:cover;border-radius:8px;display:block}
+.store-header{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+.store-name{font-size:18px;font-weight:700}
+.store-rating{display:flex;align-items:center;gap:6px;color:#ffb400}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#eee;color:#333;font-size:12px}
+.discount-badge{background:#ff6b00;color:#fff}
+.tag-badge{background:#e6e6e6}
+.store-info-row{display:flex;align-items:center;gap:8px;margin-top:8px;color:#444}
+.store-footer{display:flex;justify-content:flex-end;margin-top:12px}
+.pagination{display:flex;gap:12px;align-items:center;justify-content:center;margin-top:22px}
+.pager-btn{padding:8px 12px;border-radius:6px;border:1px solid #ddd;background:#fff;cursor:pointer}
+.pager-btn[disabled]{opacity:0.5;cursor:default}
+.favorite-toggle{background:transparent;border:none;cursor:pointer;font-size:16px}
 </style>
 </head>
 <body>
-<header class="header">
-  <div class="title">Lunch Hunter</div>
-  <div class="nav-buttons">
-    <form style="display:inline" method="post" action="/logout.php"><button type="submit">ログアウト</button></form>
-    <button onclick="location.href='mypage.php'">MY PAGE</button>
-    <button class="active">店舗一覧</button>
-    <button onclick="location.href='register.php'">店舗登録</button>
+<div class="container">
+  <div class="header">
+    <h1 class="page-title">店舗一覧（DB仕様対応）</h1>
+    <div>
+      <button onclick="location.href='register.php'">店舗登録</button>
+    </div>
   </div>
-</header>
 
-<main class="container">
-  <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <h2>店舗一覧</h2>
-      <button id="toggleSearch" class="search-toggle">店舗検索</button>
-    </div>
+  <form method="get" style="margin-bottom:12px">
+    <input type="text" name="filter" class="form-input" placeholder="検索（店舗名・住所）" value="<?=h($_GET['filter'] ?? '')?>">
+  </form>
 
-    <div id="searchPanel" style="margin-top:12px;<?php if (!isset($_GET['keyword']) && !isset($_GET['genres'])) echo 'display:none;'; ?>">
-      <form method="get" class="card" style="padding:12px">
-        <div style="margin-bottom:8px">
-          <label for="keyword">キーワード</label><br>
-          <input id="keyword" name="keyword" value="<?=h($keyword)?>" placeholder="キーワード入力">
-        </div>
+  <div class="store-grid">
+    <?php if (empty($displayed)): ?>
+      <div class="card">該当する店舗がありません。</div>
+    <?php endif; ?>
 
-        <div class="form-row">
+    <?php foreach($displayed as $s): ?>
+      <div class="card" onclick="location.href='store.php?id=<?=h($s['RST_ID'])?>'">
+        <img src="<?=h($s['PHOTO1'])?>" alt="<?=h($s['RST_NAME'])?>" class="store-image">
+        <div class="store-header">
           <div>
-            <label>並び替え</label><br>
-            <label class="checkbox-inline"><input type="radio" name="sortBy" value="popular" <?= $sortBy==='popular' ? 'checked':'' ?>> 人気順</label>
-            <label class="checkbox-inline"><input type="radio" name="sortBy" value="newest" <?= $sortBy==='newest' ? 'checked':'' ?>> 新着順</label>
+            <div class="store-name"><?=h($s['RST_NAME'])?></div>
+            <?php if (isset($s['rating'])): ?>
+              <div class="store-rating">★ <?=h(number_format($s['rating'],1))?></div>
+            <?php endif; ?>
           </div>
-
           <div>
-            <label>絞り込み</label><br>
-            <label class="checkbox-inline"><input type="checkbox" name="discount" value="1" <?= $showDiscountOnly ? 'checked':'' ?>> 割引あり</label>
-            <label class="checkbox-inline"><input type="checkbox" name="favorite" value="1" <?= $showFavoritesOnly ? 'checked':'' ?>> お気に入り登録</label>
+            <button class="favorite-toggle" type="button" aria-label="お気に入り切替" onclick="event.stopPropagation();toggleFav(this);">
+              <?= $s['isFavorite'] ? '★' : '☆' ?>
+            </button>
           </div>
         </div>
 
-        <div style="margin-top:8px">
-          <label>ジャンル</label><br>
-          <?php foreach($genres as $g): ?>
-            <label class="checkbox-inline"><input type="checkbox" name="genres[]" value="<?=h($g)?>" <?= in_array($g, $selectedGenres) ? 'checked':'' ?>> <?=h($g)?></label>
-          <?php endforeach; ?>
+        <div class="store-info-row"><strong>住所：</strong><span><?=h($s['RST_ADDRESS'])?></span></div>
+        <div class="store-info-row"><strong>営業時間：</strong>
+          <span>
+            <?=str_pad((string)$s['START_TIME_H'],2,'0',STR_PAD_LEFT)?>:<?=str_pad((string)$s['START_TIME_M'],2,'0',STR_PAD_LEFT)?> 〜
+            <?=str_pad((string)$s['END_TIME_H'],2,'0',STR_PAD_LEFT)?>:<?=str_pad((string)$s['END_TIME_M'],2,'0',STR_PAD_LEFT)?>
+          </span>
         </div>
+        <div class="store-info-row"><strong>休業日：</strong><span><?=h($holidayName[$s['RST_HOLIDAY']] ?? '-')?>曜</span></div>
+        <div class="store-info-row"><strong>支払い：</strong><span><?=h($payMethod[$s['RST_PAY']] ?? '-')?></span></div>
 
-        <div style="margin-top:12px">
-          <button type="submit">決定</button>
-          <a href="<?=h($_SERVER['PHP_SELF'])?>" style="margin-left:8px">リセット</a>
-        </div>
-      </form>
-    </div>
-
-    <div class="store-grid">
-      <?php if (empty($visible)): ?>
-        <div class="card">該当する店舗がありません。</div>
-      <?php endif; ?>
-      <?php foreach($visible as $s): ?>
-        <div class="card" role="button" onclick="location.href='store.php?id=<?=h($s['id'])?>'">
-          <div>
-            <img src="<?=h($s['image'])?>" alt="<?=h($s['name'])?>" class="store-image">
-            <?php if ($s['hasDiscount']): ?><span class="badge">割引</span><?php endif; ?>
-            <?php if ($s['isFavorite']): ?><span class="badge" style="background:#ffd166;color:#000">★ お気に入り</span><?php endif; ?>
+        <?php if (!empty($s['tags'])): ?>
+          <div style="margin-top:10px">
+            <?php foreach($s['tags'] as $tag): ?>
+              <span class="badge tag-badge"><?=h($tag)?></span>
+            <?php endforeach; ?>
           </div>
-          <div style="margin-top:8px">
-            <div class="store-header">
-              <h3 style="margin:0"><?=h($s['name'])?></h3>
-              <div><?=h($s['rating'])?> ★</div>
-            </div>
-            <div class="store-tags">
-              <?php foreach($s['tags'] as $t): ?>
-                <span class="badge" style="background:#e0e0e0;color:#333">#<?=h($t)?></span>
-              <?php endforeach; ?>
-            </div>
-            <p style="margin-top:8px;color:#666">登録者：<?=h($s['registeredBy'])?></p>
-          </div>
+        <?php endif; ?>
+
+        <?php if (!empty($s['DISCOUNT'])): ?>
+          <div style="margin-top:8px"><span class="badge discount-badge">割引</span></div>
+        <?php endif; ?>
+
+        <div class="store-footer">
+          <a href="store.php?id=<?=h($s['RST_ID'])?>"><button type="button">詳細を見る</button></a>
         </div>
-      <?php endforeach; ?>
-    </div>
-
-    <div class="pagination" style="margin-top:12px">
-      <?php if ($totalPages > 1): ?>
-        <?php for($p=1;$p<=$totalPages;$p++): ?>
-          <?php
-            $qs = build_query_with(['page'=>$p]);
-            $active = $p === $currentPage;
-          ?>
-          <a href="?<?=h($qs)?>" style="margin-right:6px; padding:6px 10px; border-radius:4px; background:<?= $active ? '#333' : '#fff'?>; color:<?= $active ? '#fff' : '#333'?>; text-decoration:none; border:1px solid #ddd"><?=h($p)?></a>
-        <?php endfor; ?>
-      <?php endif; ?>
-    </div>
-
+      </div>
+    <?php endforeach; ?>
   </div>
-</main>
+
+  <div class="pagination" role="navigation" aria-label="ページネーション">
+    <?php $totalPages = (int)ceil($total / $perPage); ?>
+    <form id="pagerForm" method="get" style="display:inline">
+      <input type="hidden" name="filter" value="<?=h($_GET['filter'] ?? '')?>">
+      <button class="pager-btn" type="button" onclick="changePage(<?=max(0,$page-1)?>)" <?= $page === 0 ? 'disabled' : '' ?>>前へ</button>
+      <span><?=($page+1)?> / <?=max(1,$totalPages)?></span>
+      <button class="pager-btn" type="button" onclick="changePage(<?=min($totalPages-1,$page+1)?>)" <?= ($page+1) >= $totalPages ? 'disabled' : '' ?>>次へ</button>
+    </form>
+  </div>
+</div>
 
 <script>
-document.getElementById('toggleSearch').addEventListener('click', function(){
-  const p = document.getElementById('searchPanel');
-  p.style.display = (p.style.display === 'none' || p.style.display==='') ? 'block' : 'none';
-});
+// ページ切替
+function changePage(p){
+  const params = new URLSearchParams(window.location.search);
+  params.set('page', p);
+  window.location.search = params.toString();
+}
+// 表示上のお気に入りトグル（サーバー永続化は未実装）
+function toggleFav(btn){
+  btn.textContent = btn.textContent === '★' ? '☆' : '★';
+  btn.classList.toggle('fav');
+}
 </script>
 </body>
 </html>
-
-?>
