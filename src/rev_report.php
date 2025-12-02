@@ -38,9 +38,9 @@ $reports = [
 <h1>通報済み口コミ一覧表示</h1>
 
 <div class="top-btn">
-    <button type="button" onclick="location.href='.php?id=<?php echo $r['id']?? 0 ?>'">通報取り消し一覧</button>
-    <button type="button" onclick="location.href='.php?id=<?php echo $r['id']?? 0 ?>'">非表示</button>
-    <button type="button" onclick="location.href='.php?id=<?php echo $r['id']?? 0 ?>'">投稿の古い順</button>
+    <button type="button">通報取り消し一覧</button>
+    <button type="button">非表示</button>
+    <button type="button">投稿の古い順</button>
 </div>
 
 
