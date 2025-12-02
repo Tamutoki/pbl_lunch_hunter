@@ -1,5 +1,5 @@
 <?php
-$reports=[
+$reports=
     [
         "account" => "タックン",
         "rating" => 2,
@@ -18,7 +18,6 @@ $reports=[
         "poster" => "投稿主",
         "reporter" => "通報者",
     ]
-];
 ?>
 
 
