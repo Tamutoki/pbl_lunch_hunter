@@ -39,7 +39,7 @@ $reports ?? [
     <button type="button" onclick="location.href=''">投稿の古い順</button>
 </div>
 
-<?php foreach ($reports as $r): ?>
+
 <section class="report-box">
 
     <div class="left">
@@ -71,7 +71,5 @@ $reports ?? [
     </div>
 
 </section>
-<?php endforeach; ?>
-
 </body>
 </html>
