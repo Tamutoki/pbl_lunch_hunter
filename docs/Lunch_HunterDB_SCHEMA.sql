@@ -1,4 +1,4 @@
--- Project Name : グルメ情報Webシステム
+-- Project Name : Lunch_Hunter
 -- Date/Time    : 2025/12/01
 -- RDBMS Type   : MySQL
 
