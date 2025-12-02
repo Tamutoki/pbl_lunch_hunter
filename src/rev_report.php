@@ -1,5 +1,5 @@
 <?php
-$reports[
+$reports=[
     [
         "account" => "タックン",
         "rating" => 2,
@@ -40,6 +40,7 @@ $reports[
 </div>
 
 
+<?php foreach ($reports as $r): ?>
 <section class="report-box">
 
     <div class="left">
@@ -55,7 +56,7 @@ $reports[
         <p><?= htmlspecialchars($r["comment"]) ?></p>
 
         <div class="small">
-            投稿主：<?= echo $reports[0][poster]?><br>
+            投稿主：<?= htmlspecialchars($r["poster"]) ?><br>
             通報者：<?= htmlspecialchars($r["reporter"]) ?>
         </div>
     </div>
@@ -64,12 +65,14 @@ $reports[
         <h3>▲ <?= htmlspecialchars($r["store"]) ?></h3>
         <p>通報内容：<?= htmlspecialchars($r["report_reason"]) ?></p>
 
-        <!-- クリックでリンク先へ遷移 -->
-        <button type="button" onclick="location.href='detail.php?id=<?= $r[''] ?>'">詳細</button>
-        <button type="button" onclick="location.href='cancel.php?id=<?= $r[''] ?>'">取り消し</button>
-        <button type="button" onclick="location.href='delete.php?id=<?= $r[''] ?>'">削除</button>
+        <!-- 遷移ボタン（ID を URL パラメータとして渡す） -->
+        <button type="button" onclick="location.href='detail.php?id=<?= $r['id'] ?>'">詳細</button>
+        <button type="button" onclick="location.href='cancel.php?id=<?= $r['id'] ?>'">取り消し</button>
+        <button type="button" onclick="location.href='delete.php?id=<?= $r['id'] ?>'">削除</button>
     </div>
 
 </section>
+<?php endforeach; ?>
+
 </body>
 </html>
