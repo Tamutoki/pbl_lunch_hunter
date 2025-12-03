@@ -4,7 +4,7 @@ class Model
     protected $table;
     protected $db;
     protected static $conf = [
-        'host'=>'mysql','user'=>'root','pass'=>'root','dbname'=>'pbl2025web2db'
+        'host'=>'mysql','user'=>'root','pass'=>'root','dbname'=>'test'
     ];
 
     protected static $codes = [
