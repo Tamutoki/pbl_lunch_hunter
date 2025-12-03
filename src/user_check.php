@@ -1,5 +1,5 @@
-<!--ログインチェック-->
 <?php
+//ログインチェック
 require_once 'model.php';
 $model = new User();
 
