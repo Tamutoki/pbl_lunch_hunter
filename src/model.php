@@ -118,12 +118,12 @@ class User extends Model
     }
     //姓名結合
     function username($user){
-        $username = "{$user['user_l_name']}_{$user['user_f_name']}";
+        $username = "{$user['user_l_name']} {$user['user_f_name']}";
         return $username;
     }
     //フリガナ結合
     function userkana($user){
-        $userkana = "{$user['user_l_kana']}_{$user['user_f_kana']}";
+        $userkana = "{$user['user_l_kana']} {$user['user_f_kana']}";
         return $userkana;
     }
     //ユーザ詳細
@@ -145,11 +145,6 @@ class User extends Model
     function get_userlist($where=1, $orderby=null, $limit=0, $offset=0){
         $sql = "SELECT * FROM t_user NATURAL JOIN t_usertype WHERE {$where}";
         $users =  $this->query($sql,$orderby, $limit, $offset);
-        foreach($users as &$user){
-            $user['username'] = $this->username($user);
-            $user['userkana'] = $this->userkana($user);
-        }
-        unset($user);
 
         return $users;
     }
@@ -178,10 +173,14 @@ class User extends Model
 class Restaurant extends Model
 {
     protected $table = "t_rstinfo";
-    
 }
 
 class Review extends Model
 {
     protected $table = "t_review";
+}
+
+class Report extends Model
+{
+    protected $table = "t_report";
 }
