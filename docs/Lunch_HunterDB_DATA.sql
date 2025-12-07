@@ -42,4 +42,7 @@ VALUES
 ;
 
 INSERT INTO t_review
- (eval_point)
+ (eval_point,review_comment,rst_id,user_id,rev_state)
+VALUES
+ ('4','良かった','1','test','true')
+;
