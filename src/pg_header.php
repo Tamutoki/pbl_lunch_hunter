@@ -5,7 +5,6 @@
 <head>
   <meta http-equiv="Content-TYPE" content="text/html; charset=UTF-8">
   <link rel="stylesheet" TYPE="text/css" href="css/style.css">
-  
 </head>
 
 <body>
@@ -43,7 +42,6 @@
 
         } else {
           echo  '<a href="?do=user_login">ログイン</a>';
-
         }
         ?>
       </div>
