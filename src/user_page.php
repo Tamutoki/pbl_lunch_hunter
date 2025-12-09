@@ -41,7 +41,7 @@ $shops=array(
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>通報済み口コミ一覧</title>
+    <title>MY PAGE</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -95,31 +95,27 @@ $shops=array(
         <div class="info">
             <div>
                 <div class="item1">社員番号ID:</div>
-                <!--<input type="text" placeholder="<?php echo $mydata['user_id'] ?>"-->
                 <div><?php echo $mydata['user_id'] ?></div><br>
             </div>
             <div>
                 <div class="item1">氏名:</div>
-                <!--<input type="text" placeholder="<?php echo $mydata['name'] ?>"><input type="text" placeholder="<?php echo$info['名'] ?>">-->
                 <div><?php echo $mydata['name'] ?></div><br>
             </div>
         </div>
         <div class="info1">
             <div>
                 <div class="item1">アカウント名:</div>
-                <!--<input type="text" placeholder="<?php echo $mydata['user_account'] ?>">-->
                 <div><?php echo $mydata['user_account'] ?></div><br>
             </div>
             <div>
                 <div class="item1">フリガナ:</div>
-                <!--<input type="text" placeholder="<?php echo $mydata['kana']?>"><input type="text" placeholder="<?php echo $info['メイ']?>">-->
                 <div><?php echo $mydata['kana'] ?></div><br>
             </div>
         </div>
     </div>
+<!--投稿店舗-->
 <div class="shop">
     <?php foreach ($shops as $shop): ?>
-        <!--投稿店舗-->
             <div class="item">
                 <div class="shopi">
                     <h4>店舗名:<?php echo $shop['店舗名'] ?></h4>
