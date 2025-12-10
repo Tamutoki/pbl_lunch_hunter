@@ -1,5 +1,4 @@
 <?php
-session_start();
 require_once 'model.php';
 
 $error = false;
@@ -26,7 +25,7 @@ if(!$error){
     $pay = isset($_POST['payment']) ? array_sum($_POST['payment']) : 0;
 
     // ファイル処理
-    $photo_file = null;
+    $photo_file = '';
     if(isset($_FILES['photo_file']) && $_FILES['photo_file']['error'] === UPLOAD_ERR_OK){
         $upload_dir = 'uploads/';
         if(!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
@@ -42,12 +41,10 @@ if(!$error){
         'end_time'=> $_POST['close_time'],
         'tel_num'=> $tel_num,
         'rst_holiday'=> $holiday,
-        'rst_genre'=> $genre,
         'rst_pay'=> $pay,
-        'rst_url'=> $_POST['url'] ?? null,
-
-        'photo_file'=> $photo_file,
-        'user_id'=> $_POST['user_id'] ?? 1,
+        'rst_info'=> $_POST['url'] ?? '',
+        'photo1'=> $photo_file,
+        'user_id'=> $_SESSION['user_id'],
         'discount'=> 0
     ];
 
@@ -55,13 +52,14 @@ if(!$error){
     $rows = $rst_save->insert($data);
 
     // 登録した店舗のIDを取得
-    $rst_detail = $rst_save->getDetail(['rst_name' => $data['rst_name']]);
+    $rst_detail = $rst_save->get_RstDetail(['rst_name' => $data['rst_name']]);
     $rst_id = $rst_detail['rst_id'] ?? null;
 
+    $genre_save = new Genre();
     // ジャンル保存
     $genre_array = $_POST['genre'] ?? [];
     if($rst_id !== null){
-        $rows = $rst_save->save_genre($rst_id, $genre_array);
+        $rows = $genre_save->save_genre($rst_id, $genre_array);
     }
 
     // 結果メッセージ

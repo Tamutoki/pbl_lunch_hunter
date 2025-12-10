@@ -157,3 +157,5 @@ main { max-width:1000px; margin:20px auto; padding:0 15px; }
     <?php endfor; ?>
   </div>
 </main>
+</body>
+</html>
