@@ -180,7 +180,8 @@ class Model
     {
         $setParts = [];
         foreach ($data as $k => $v) {
-            $v = is_string($v) ? "'{$v}'" : $v;
+            $v = is_string($v)? "'" . $this->db->real_escape_string($v) . "'": $v;
+
             $setParts[] = "{$k}={$v}";
         }
         $setStr = implode(',', $setParts);
