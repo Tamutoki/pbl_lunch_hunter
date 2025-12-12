@@ -162,10 +162,6 @@ $displayList = array_slice($rst_list_filtered, $start, $limit);
                   <div class="discount-label" style="position:absolute; top:10px; right:10px; color:green; font-weight:bold;">
                     割引あり
                   </div>
-                <?php else : ?>
-                  <div class="discount-label" style="position:absolute; top:10px; right:10px; color:red; font-weight:bold;">
-                    割引なし
-                  </div>
                 <?php endif; ?>
               <?php endif; ?>
             </h4>
