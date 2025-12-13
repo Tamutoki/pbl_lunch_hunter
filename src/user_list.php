@@ -5,9 +5,9 @@ $user = new User();
 // GET パラメータ取得
 $search_key = $_GET['q'] ?? '';
 $sort       = $_GET['sort'] ?? '';
-$suspended  = isset($_GET['suspended']) ? 1 : 0;
+$stop_user  = isset($_GET['stop_user']) ? true : false;
 
-$user_list = $user->get_userlist_filtered($search_key, $suspended, $sort);
+$user_list = $user->get_userlist_filtered($search_key, $stop_user, $sort);
 ?>
 
 <style>
@@ -89,7 +89,7 @@ $user_list = $user->get_userlist_filtered($search_key, $suspended, $sort);
                     <div class="filter-box" style="margin-top:10px;">
                         <label><input type="radio" name="sort" value="id" <?= ($sort === 'id') ? 'checked' : ''; ?>> ユーザーID順</label>
                         <label><input type="radio" name="sort" value="address" <?= ($sort === 'address') ? 'checked' : ''; ?>> 五十順</label>
-                        <label><input type="checkbox" name="suspended" <?= $suspended ? 'checked' : ''; ?>> 停止済みアカウント</label>
+                        <label><input type="checkbox" name="stop_user" <?= $stop_user ? 'checked' : ''; ?>> 停止済みアカウント</label>
                     </div>
                 </div>
 

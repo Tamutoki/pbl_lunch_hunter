@@ -308,7 +308,7 @@ class User extends Model
         $user['userkana'] = $this->userkana($user);
         return $user;
     }
-    public function get_userlist_filtered($search_key = '', $suspended_only = false, $orderby = null)
+    public function get_userlist_filtered($search_key = '', $stop_user = false, $orderby = null)
     {
         $where = [];
 
@@ -325,7 +325,7 @@ class User extends Model
         }
 
         // 停止中か通常か
-        if ($suspended_only) {
+        if ($stop_user) {
             $where[] = "usertype_id = 2";
         } else {
             $where[] = "usertype_id = 1";
