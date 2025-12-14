@@ -327,8 +327,6 @@ class User extends Model
         // 停止中か通常か
         if ($stop_user) {
             $where[] = "usertype_id = 2";
-        } else {
-            $where[] = "usertype_id = 1";
         }
 
         // ORDER BY

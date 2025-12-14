@@ -150,7 +150,7 @@ $displayList = array_slice($rst_list_filtered, $start, $limit);
   <h2>店舗一覧</h2>
 
   <?php if (empty($displayList)) : ?>
-    <p>条件に一致する店舗がありません。</p>
+    <p>0件</p>
   <?php else : ?>
     <div class="row">
       <?php foreach ($displayList as $s) : ?>

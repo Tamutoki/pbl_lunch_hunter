@@ -13,14 +13,14 @@ if (!empty($_GET['msg'])) {
 
 <form action="?do=user_save" method="post">
 <table class="table table-hover" width="100%" style="table-layout:fixed;">
-<tr><td>ユーザID</td><td></td><td>氏名姓</td><td>氏名名</td></tr>
+<tr><td>ユーザID</td><td></td><td>氏名_姓</td><td>氏名_名</td></tr>
 <tr>
     <td><input type="text" name="user_id" class="form-control" required></td>
     <td></td>
     <td><input type="text" name="user_l_name" class="form-control" required></td>
     <td><input type="text" name="user_f_name" class="form-control" required></td>
 </tr>
-<tr><td>初期パスワード</td><td></td><td>フリガナ姓</td><td>フリガナ名</td></tr>
+<tr><td>初期パスワード</td><td></td><td>フリガナ_姓</td><td>フリガナ_名</td></tr>
 <tr><td><input type="password" name="pass" class="form-control" required></td>
     <td></td>
     <td><input type="text" name="user_l_kana" class="form-control" required></td>
