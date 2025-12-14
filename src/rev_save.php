@@ -8,6 +8,7 @@ $report = new Report();
 function readBlob($key) {
     if (!empty($_FILES[$key]['tmp_name'])) {
         return file_get_contents($_FILES[$key]['tmp_name']);
+
     }
     return null;
 }
@@ -50,6 +51,7 @@ switch ($mode) {
 
         $review->update($data, 'review_id=' . intval($review_id));
         header('Location:?do=rst_detail&rst_id=' . intval($rst_id));
+
         exit;
         break;
 
@@ -69,7 +71,6 @@ switch ($mode) {
                 $data["photo" . ($i + 1)] = $blob;
             }
         }
-
         $review->insert($data);
         header('Location:?do=rst_detail&rst_id=' . intval($rst_id));
         exit;
